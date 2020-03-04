@@ -14,6 +14,7 @@ jupyter-core==4.4.0
 jupyterlab==1.0.9
 jupyterlab-server==1.0.0
 notebook==5.7.0
+pandas
 psycopg2==2.7.4
 tornado==5.1.1
 s3transfer==0.1.13
