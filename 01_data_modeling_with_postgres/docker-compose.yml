@@ -8,7 +8,6 @@ services:
     - "8888:8888"
     volumes:
     - ./dev_env:/opt/dev_env
-    - ./common_vol:/tmp
     links:
     - db
     depends_on: 
@@ -21,7 +20,6 @@ services:
     - "5432:5432"
     volumes: 
       - ./postgres_db:/var/lib/postgresql/data
-      - ./common_vol:/tmp
     environment: 
       POSTGRES_DB: studentdb
       POSTGRES_USER: student

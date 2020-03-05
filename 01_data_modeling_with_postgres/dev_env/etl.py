@@ -12,14 +12,6 @@ logging.basicConfig(
     )
 
 
-def _temp_to_sql(df, tablename, cur):
-    from tempfile import NamedTemporaryFile
-    with NamedTemporaryFile() as tmp:
-        df.to_csv(tmp.name, header=True, index=False)
-        logging.info(f'Copying csv to table: {tablename}')
-        cur.execute(bulk_copy.format(tablename, tmp.name))
-
-
 def process_artists(df, cur):
     """
     Process artist data from a dataframe of songs and artist data
@@ -94,7 +86,8 @@ def process_time(df, cur):
     time_df['year'] = df['ts'].dt.year
     time_df['weekday'] = df['ts'].dt.dayofweek
 
-    _temp_to_sql(time_df, 'time', cur)
+    for i, row in time_df.iterrows():
+        cur.execute(time_table_insert, list(row))
 
 
 def process_users(df, cur):
@@ -116,7 +109,8 @@ def process_users(df, cur):
         ]].drop_duplicates()
 
     # insert user records
-    _temp_to_sql(user_df, 'users', cur)
+    for i, row in user_df.iterrows():
+        cur.execute(user_table_insert, row)
 
 
 def process_songplays(df, cur):
