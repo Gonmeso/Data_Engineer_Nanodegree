@@ -16,6 +16,8 @@ services:
     image: postgres:9.5.19
     container_name: db
     restart: always
+    ports:
+    - "5432:5432"
     volumes: 
       - ./postgres_db:/var/lib/postgresql/data
     environment: 
