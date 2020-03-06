@@ -3,6 +3,7 @@ import glob
 import functools
 import logging
 import psycopg2
+import math
 import pandas as pd
 from sql_queries import *
 
@@ -10,6 +11,14 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
     )
+
+
+def clean_nan_data(values):
+    for i, v in enumerate(values):
+        if isinstance(v, float):
+            values[i] = None if math.isnan(v) else v
+    return values
+         
 
 
 def process_artists(df, cur):
@@ -28,7 +37,7 @@ def process_artists(df, cur):
         'artist_longitude'
         ]].values[0])
 
-    cur.execute(artist_table_insert, artist_data)
+    cur.execute(artist_table_insert, clean_nan_data(artist_data))
 
 
 def process_songs(df, cur):
@@ -46,7 +55,7 @@ def process_songs(df, cur):
         'year',
         'duration'
         ]].values[0])
-    cur.execute(song_table_insert, song_data)
+    cur.execute(song_table_insert, clean_nan_data(song_data))
 
 
 def process_song_file(cur, filepath):
@@ -59,6 +68,9 @@ def process_song_file(cur, filepath):
     """
     # open song file
     df = pd.read_json(filepath, lines=True)
+
+    # Make year a NaN for later processing
+    df.year[df.year == 0] = None
 
     # Process data
     process_artists(df, cur)

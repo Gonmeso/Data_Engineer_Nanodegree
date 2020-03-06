@@ -43,7 +43,7 @@ song_table_create = (
     (song_id varchar,
     title varchar NOT NULL,
     artist_id varchar,
-    year int NOT NULL,
+    year int,
     duration numeric NOT NULL,
     PRIMARY KEY(song_id),
     FOREIGN KEY(artist_id) REFERENCES artists(artist_id));
