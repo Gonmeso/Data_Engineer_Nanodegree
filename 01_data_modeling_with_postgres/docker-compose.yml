@@ -27,6 +27,7 @@ services:
       context: ./dashboard
     container_name: dashboard
     env_file: .env
+    restart: always
     volumes:
       - ./dashboard:/opt/dashboard
     ports:
