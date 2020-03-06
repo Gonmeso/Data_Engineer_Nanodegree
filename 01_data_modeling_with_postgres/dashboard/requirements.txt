@@ -2,3 +2,4 @@ dash==1.8.0
 pandas
 psycopg2==2.7.4
 sqlalchemy
+dash-bootstrap-components
