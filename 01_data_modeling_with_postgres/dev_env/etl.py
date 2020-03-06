@@ -12,6 +12,9 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
     )
 
+DBUSER = os.getenv('POSTGRES_USER')
+DBNAME = os.getenv('DATA_DB')
+DBPASS = os.getenv('POSTGRES_PASSWORD')
 
 def clean_nan_data(values):
     """
@@ -214,7 +217,7 @@ def process_data(cur, conn, filepath, func):
 
 
 def main():
-    conn = psycopg2.connect("host=db dbname=sparkifydb user=student password=student")
+    conn = psycopg2.connect(f"host=db dbname={DBNAME} user={DBUSER} password={DBPASS}")
     cur = conn.cursor()
 
     process_data(cur, conn, filepath='data/song_data', func=process_song_file)

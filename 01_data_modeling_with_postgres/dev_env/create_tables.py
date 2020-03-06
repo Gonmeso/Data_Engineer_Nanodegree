@@ -1,6 +1,7 @@
 import psycopg2
 import logging
 import re
+import os
 from sql_queries import create_table_queries, drop_table_queries
 
 logging.basicConfig(
@@ -8,6 +9,10 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
     )
 
+DBUSER = os.getenv('POSTGRES_USER')
+DBNAME = os.getenv('DATA_DB')
+DEFAULT_DB = os.getenv('POSTGRES_DB')
+DBPASS = os.getenv('POSTGRES_PASSWORD')
 
 def _get_table_name(s):
     """
@@ -29,7 +34,7 @@ def create_database():
     # connect to default database
     logging.info('Connecting to default database')
     conn = psycopg2.connect(
-        "host=db dbname=studentdb user=student password=student"
+        f"host=db dbname={DEFAULT_DB} user={DBUSER} password={DBPASS}"
         )
     conn.set_session(autocommit=True)
     cur = conn.cursor()
@@ -48,7 +53,7 @@ def create_database():
     # connect to sparkify database
     logging.info('Connecting to sparkifydb')
     conn = psycopg2.connect(
-        "host=db dbname=sparkifydb user=student password=student"
+        f"host=db dbname={DBNAME} user={DBUSER} password={DBUSER}"
         )
     cur = conn.cursor()
 

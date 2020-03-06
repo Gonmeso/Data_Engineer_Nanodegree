@@ -4,6 +4,7 @@ services:
     build: 
       context: ./dev_env
     container_name: dev_env
+    env_file: .env
     ports:
     - "8888:8888"
     volumes:
@@ -20,7 +21,18 @@ services:
     - "5432:5432"
     volumes: 
       - ./postgres_db:/var/lib/postgresql/data
-    environment: 
-      POSTGRES_DB: studentdb
-      POSTGRES_USER: student
-      POSTGRES_PASSWORD: student
+    env_file: .env
+  dashboard:
+    build:
+      context: ./dashboard
+    container_name: dashboard
+    env_file: .env
+    volumes:
+      - ./dashboard:/opt/dashboard
+    ports:
+      - "8050:8050"
+    links:
+      - db
+    depends_on: 
+      - db
+      - dev_env
