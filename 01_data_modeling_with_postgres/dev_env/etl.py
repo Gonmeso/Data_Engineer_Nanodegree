@@ -14,6 +14,12 @@ logging.basicConfig(
 
 
 def clean_nan_data(values):
+    """
+    Clean NaN values from a python list a convert them into None
+
+    :param values: python list that will be cleaned of NaN's
+    :return: a list with the NaN's replaced by None's
+    """
     for i, v in enumerate(values):
         if isinstance(v, float):
             values[i] = None if math.isnan(v) else v
