@@ -7,8 +7,7 @@ from dash.dependencies import Input, Output
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
-logo = '//images.ctfassets.net/2y9b3o528xhq/1I5Q4ulQdaV2Cd2RxJG1NF/\
-    9012118676e481a058bbbc1951c953c1/degree-hat.svg'
+logo = 'https://images.ctfassets.net/2y9b3o528xhq/1I5Q4ulQdaV2Cd2RxJG1NF/9012118676e481a058bbbc1951c953c1/degree-hat.svg'
 title = 'Data Modeling With Postgres: A example of simple\
      queries on the fact table'
 
