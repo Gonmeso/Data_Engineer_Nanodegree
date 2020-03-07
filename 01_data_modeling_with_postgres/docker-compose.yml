@@ -5,10 +5,6 @@ services:
       context: ./dev_env
     container_name: dev_env
     env_file: .env
-    ports:
-    - "8888:8888"
-    volumes:
-    - ./dev_env:/opt/dev_env
     links:
     - db
     depends_on: 
@@ -28,12 +24,9 @@ services:
     container_name: dashboard
     env_file: .env
     restart: always
-    volumes:
-      - ./dashboard:/opt/dashboard
     ports:
       - "8050:8050"
     links:
       - db
     depends_on: 
-      - db
       - dev_env
