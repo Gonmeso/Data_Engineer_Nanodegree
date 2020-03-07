@@ -24,6 +24,33 @@ POSTGRES_PASSWORD=student
 DATA_DB=sparkifydb
 ```
 
+### Folder structure
+
+The project is structured as follows
+
+```
+├── README.md
+├── dashboard                       # Dashboard main folder
+│   ├── Dockerfile
+│   ├── app.py                      # Fundamental code for the dashboard
+│   ├── requirements.txt
+│   └── utils.py                    # Functions and variables used in the dashboard
+├── dev_env                         # Main folder of the development environment (includes jupyter)
+│   ├── Dockerfile
+│   ├── create_tables.py            # Completed script to create database and tables
+│   ├── data
+│   │   ├── log_data
+│   │   └── song_data
+│   ├── etl.ipynb
+│   ├── etl.py                      # Completed script to perform ETL
+│   ├── requirements.txt
+│   ├── sql_queries.py
+│   ├── start.sh
+│   └── test.ipynb
+├── postgres_db                     # Folder allocating the volume of the docker in order to persist data
+├── docker-compose.yml
+```
+
 ### Running the project
 
 To run the project the only thing you need to to is execute `docker-compose up` and the next steps will be performed:
