@@ -1,0 +1,23 @@
+version: '3'
+services:
+  dev_env:
+    build: 
+      context: ./dev_env
+    container_name: dev_env_cassandra
+    ports: 
+      - "8888:8888"
+    volumes: 
+      - "./dev_env:/opt/dev_env"
+    links:
+    - cassandra
+    depends_on: 
+    - cassandra
+  cassandra:
+    image: cassandra:3.11.6
+    container_name: cassandra
+    restart: always
+    ports:
+    - "7000:7000"
+    - "9042:9042"
+    volumes: 
+      - ./cassandra:/var/lib/cassandra
