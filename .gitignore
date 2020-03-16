@@ -1,4 +1,5 @@
 .ipynb_checkpoints
 postgres_db/
+cassandra/
 __pycache__
 .env
