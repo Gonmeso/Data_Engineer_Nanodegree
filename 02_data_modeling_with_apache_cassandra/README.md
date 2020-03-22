@@ -1,6 +1,6 @@
 # Data Modeling With Apache Cassandra
 
-**TBD**
+A Data Engineering project focused on learning the basics of Data Modeling using cassandras as the main storage tool, performing ETL's using python.
 
 ## Getting Started
 
