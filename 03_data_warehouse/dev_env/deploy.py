@@ -1,25 +1,6 @@
-import configparser
 import time
-import boto3
+from utils import cfg, create_cf_client, STACK_NAME
 
-
-# Parse config to get data to create stack
-cfg = configparser.ConfigParser()
-cfg.read('dwh.cfg')
-STACK_NAME = cfg['CLOUDFORMATION']['STACK_NAME']
-
-def get_aws_credentials():
-    '''
-    Retrieve AWS credentials for later use
-
-    :returns : both access and secret key
-    '''
-    print('---- Retrieving credentials ----')
-    access = cfg['AWS']['AWS_ACCESS_KEY']
-    secret = cfg['AWS']['AWS_SECRET_KEY']
-    region = cfg['AWS']['REGION']
-
-    return access, secret, region
 
 def create_stack_params():
     '''
@@ -50,23 +31,6 @@ def create_stack_params():
     return params
 
 
-def create_cf_client():
-    '''
-    Creates the CloudFormation client using aws credentials
-
-    :returns : cloudformation client ready to use
-    '''
-    access, secret, region = get_aws_credentials()
-    cf = boto3.client(
-        'cloudformation',
-        region_name=region,
-        aws_access_key_id=access,
-        aws_secret_access_key=secret
-        )
-    
-    return cf
-
-
 def create_cf_stack():
     '''
     Start the creation of the stack in AWS
@@ -76,7 +40,7 @@ def create_cf_stack():
 
     with open('sparkify_cloudformation.yaml', 'r') as f:
         template = f.read()
-    
+
     print('---- Creating Stack ----')
     cf.create_stack(
         StackName=STACK_NAME,
@@ -108,8 +72,6 @@ def check_if_complete(waiting_time):
             time.sleep(waiting_time)
 
 
-
 if __name__ == '__main__':
     create_cf_stack()
     check_if_complete(15)
-    
