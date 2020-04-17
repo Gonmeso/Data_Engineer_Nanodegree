@@ -71,3 +71,9 @@ Outputs:
       !GetAtt SparkifyRedshiftCluster.Endpoint.Address
     Export:
       Name: SparkifyEndpoint
+  SparkifyRoleOutput:
+    Description: the sparkify role arn
+    Value:
+      !GetAtt SparkifyRole.Arn
+    Export:
+      Name: SparkifyARN
