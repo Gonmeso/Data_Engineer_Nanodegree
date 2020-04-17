@@ -3,11 +3,10 @@ import time
 import boto3
 
 
-STACK_NAME = 'sparkify-stack'
-
 # Parse config to get data to create stack
 cfg = configparser.ConfigParser()
 cfg.read('dwh.cfg')
+STACK_NAME = cfg['CLOUDFORMATION']['STACK_NAME']
 
 def get_aws_credentials():
     '''
