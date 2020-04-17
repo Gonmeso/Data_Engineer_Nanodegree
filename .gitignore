@@ -3,3 +3,6 @@ postgres_db/
 cassandra/
 __pycache__
 .env
+env/
+venv/
+.venv/
