@@ -1,0 +1,79 @@
+Parameters:
+  RoleNameParam:
+    Description: Name of the IAM role for redshift
+    Type: String
+  ClusterId:
+    Description: Identification name for the sparkify cluster
+    Type: String
+    Default: sparkify-cluster
+  DBname:
+    Description: Name of the database for the Redshift cluster
+    Type: String
+    Default: sparkifyDB
+  MasterUser:
+    Description: Name of the master user of the Redshift cluster
+    Type: String
+    Default: admin
+  MasterPassword:
+    Description: Password for the master user of the Redshift cluster
+    Type: String
+  NodeType:
+    Description: Instance type for the cluster
+    Type: String
+    Default: ds2.xlarge
+  ClusterType:
+    Description: Type of the cluster, single or multinode
+    Type: String
+    AllowedValues:
+      - single-node
+      - multi-node
+    Default: single-node
+  NumberOfNodes:
+    Description: Number of nodes for the cluster
+    Type: Number
+    Default: 1
+Conditions: 
+  UseNumberOfNodes: !Not [!Equals [!Ref NumberOfNodes, 1]]
+Resources:
+  SparkifyRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - redshift.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+      Path: /
+      RoleName: !Ref RoleNameParam
+  SparkifyRedshiftCluster:
+    Type: "AWS::Redshift::Cluster"
+    Properties:
+      ClusterIdentifier: !Ref ClusterId
+      DBName: !Ref DBname
+      MasterUsername: !Ref MasterUser
+      MasterUserPassword: !Ref MasterPassword
+      NodeType: !Ref NodeType
+      ClusterType: !Ref ClusterType
+      NumberOfNodes: !If [UseNumberOfNodes, !Ref NumberOfNodes, !Ref "AWS::NoValue"]
+      IamRoles:
+        - !GetAtt SparkifyRole.Arn
+    DependsOn: SparkifyRole
+Outputs:
+  ClusterEndpoint:
+    Description: returns the redshift cluster endpoint
+    Value:
+      !GetAtt SparkifyRedshiftCluster.Endpoint.Address
+    Export:
+      Name: SparkifyEndpoint
+  SparkifyRoleOutput:
+    Description: the sparkify role arn
+    Value:
+      !GetAtt SparkifyRole.Arn
+    Export:
+      Name: SparkifyARN
