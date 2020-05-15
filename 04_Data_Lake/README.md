@@ -101,7 +101,13 @@ When executing on a EMR cluster the `etl_emr.ipynb` must be attached to it and e
 
 Executing the process generates the parquet files in the specified bucket.
 
+![bucket](./img/result_bucket.png)
+
 ![result](./img/result.png)
+
+![bucket](./img/result_songpaly.png)
+
+![bucket](./img/result_songs.png)
 
 ## Authors
 
