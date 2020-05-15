@@ -12,11 +12,14 @@ The first step is to clone the repository `git clone https://github.com/Gonmeso/
 The project is structured as follows:
 
 ```
-├── ETL.ipynb
-├── data            # Not tracked by git
-├── data_lake.cfg
-├── etl.py
-└── requirements.txt
+.
+├── README.md
+└── dev_env
+    ├── ETL.ipynb
+    ├── data_lake.cfg
+    ├── etl.py
+    ├── etl_emr.ipynb
+    └── requirements.txt
 ```
 
 ### Prerequisites
@@ -93,6 +96,12 @@ python etl.py
 
 When executing on a EMR cluster the `etl_emr.ipynb` must be attached to it and executed. As this is not a production process there is no need to submit the script to the cluster, but it would be a good practice doing so.
 
+
+### Results
+
+Executing the process generates the parquet files in the specified bucket.
+
+![result](./img/result.png)
 
 ## Authors
 
