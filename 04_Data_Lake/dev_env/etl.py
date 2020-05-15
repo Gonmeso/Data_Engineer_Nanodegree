@@ -78,7 +78,7 @@ def process_log_data(spark, input_data, output_data):
     # Cast ts to timestamp
     print('------ Casting to timestamp ------')
     events = events.withColumn("start_time",
-        col("ts").cast("timestamp"))
+        (col("ts")/1000).cast("timestamp"))
 
     # Create temporal table
     print('------ Creating temporal table "tmp_events" ------')
