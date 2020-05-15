@@ -128,7 +128,9 @@ def process_log_data(spark, input_data, output_data):
     songplays_table = spark.sql(
     '''
     SELECT e.start_time, e.userId AS user_id, e.level, e.sessionId AS session_id, e.location,
-           e.userAgent AS user_agent, s.song_id, s.artist_id
+           e.userAgent AS user_agent, s.song_id, s.artist_id,
+           EXTRACT(month from start_time) as month,
+           EXTRACT(year from start_time) as year
     FROM tmp_events e
     JOIN tmp_songs s ON e.artist = s.artist_name
     AND e.song = s.title
