@@ -14,12 +14,17 @@ The project is structured as follows:
 ```
 .
 ├── README.md
-└── dev_env
-    ├── ETL.ipynb
-    ├── data_lake.cfg
-    ├── etl.py
-    ├── etl_emr.ipynb
-    └── requirements.txt
+├── dev_env
+│   ├── ETL.ipynb
+│   ├── data_lake.cfg
+│   ├── etl.py
+│   ├── etl_emr.ipynb
+│   └── requirements.txt
+└── img
+    ├── result.png
+    ├── result_bucket.png
+    ├── result_songpaly.png
+    └── result_songs.png
 ```
 
 ### Prerequisites
