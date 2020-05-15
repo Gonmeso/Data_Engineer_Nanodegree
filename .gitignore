@@ -6,3 +6,4 @@ __pycache__
 env/
 venv/
 .venv/
+04_Data_Lake/dev_env/data
