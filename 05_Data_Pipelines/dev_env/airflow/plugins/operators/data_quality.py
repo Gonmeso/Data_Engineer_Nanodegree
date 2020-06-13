@@ -6,17 +6,43 @@ class DataQualityOperator(BaseOperator):
 
     ui_color = '#89DA59'
 
+    tables = [
+        'artists',
+        'songs',
+        'time',
+        'songplays',
+        'users'
+    ]
     @apply_defaults
     def __init__(self,
-                 # Define your operators params (with defaults) here
-                 # Example:
-                 # conn_id = your-connection-name
+                 redshift_conn_id=None,
+                 sql_test=None,
+                 table=None,
                  *args, **kwargs):
 
         super(DataQualityOperator, self).__init__(*args, **kwargs)
-        # Map params here
-        # Example:
-        # self.conn_id = conn_id
+        self.redshift_conn_id = redshift_conn_id
+        self.sql_test = sql_test
+        self.table = table
 
     def execute(self, context):
-        self.log.info('DataQualityOperator not implemented yet')
+
+        redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
+
+        if self.sql_test is None:
+            self.sql_test = 'SELECT COUNT(*) FROM {}'
+            self.log.info('Query: {}'.format(self.sql_test))
+        if self.table is None:
+            for t in self.tables:
+                self.log.info('Data Quality @  {}'.format(t))
+                records = redshift.run(self.sql_test.format(t))
+                if len(records) < 1 or len(records[0]) < 1 or records[0][0] < 1:
+                    self.log.info('Data Quality not passed raising error')
+                    raise ValueError('Data Quality not passed for table: {}'.format(t))
+        else:
+            records = redshift.run(self.sql_test.format(self.table))
+            if len(records) < 1 or len(records[0]) < 1 or records[0][0] < 1:
+                    self.log.info('Data Quality not passed raising error')
+                    raise ValueError('Data Quality not passed for table: {}'.format(t))
+        self.log.info('Data Quality passed!')
+
