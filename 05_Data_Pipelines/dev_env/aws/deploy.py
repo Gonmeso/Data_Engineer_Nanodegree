@@ -27,7 +27,7 @@ def create_stack_params():
         {'RoleNameParam':'sparkify-dwh-role'},
         {'ClusterId': 'sparkify-cluster'},
         {'ClusterType': 'single-node'},
-        {'NodeType': 'ds2.xlarge'},
+        {'NodeType': 'dc2.large'},
         {'NumberOfNodes': '1'},
         {'DBname': 'sparkify'},
         {'MasterUser': 'awsuser'},

@@ -14,7 +14,7 @@ cfg = Variable.get('sparkify', deserialize_json=True)
 
 default_args = {
         'owner': 'udacity',
-        'start_date': datetime(2019, 1, 12),
+        'start_date': datetime(2020, 6, 12),
         'depends_on_past': False,
 #        'retries': 3,
         'retry_delay': timedelta(minutes=5),
@@ -63,7 +63,7 @@ load_user_dimension_table = LoadDimensionOperator(
     redshift_conn_id='redshift',
     table=cfg['redshift']['table_users'],
     truncate=True,
-    pk='userid'
+    sql=SqlQueries.users_table_insert,
 )
 
 load_song_dimension_table = LoadDimensionOperator(
@@ -72,7 +72,7 @@ load_song_dimension_table = LoadDimensionOperator(
     redshift_conn_id='redshift',
     table=cfg['redshift']['table_songs'],
     truncate=True,
-    pk='song_id'
+    sql=SqlQueries.songs_table_insert,
 )
 
 load_artist_dimension_table = LoadDimensionOperator(
@@ -81,7 +81,7 @@ load_artist_dimension_table = LoadDimensionOperator(
     redshift_conn_id='redshift',
     table=cfg['redshift']['table_artists'],
     truncate=True,
-    pk='artist_id'
+    sql=SqlQueries.artists_table_insert,
 )
 
 load_time_dimension_table = LoadDimensionOperator(
@@ -90,7 +90,7 @@ load_time_dimension_table = LoadDimensionOperator(
     redshift_conn_id='redshift',
     table=cfg['redshift']['table_time'],
     truncate=True,
-    pk='start_time'
+    sql=SqlQueries.time_table_insert,
 )
 
 run_quality_checks = DataQualityOperator(

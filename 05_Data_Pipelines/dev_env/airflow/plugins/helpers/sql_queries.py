@@ -46,6 +46,7 @@ class SqlQueries:
         COPY {}
         FROM '{}'
         CREDENTIALS 'aws_iam_role={}'
+        REGION 'us-west-2'
         TIMEFORMAT AS 'epochmillisecs'
         JSON '{}'
         TRUNCATECOLUMNS

@@ -1,4 +1,3 @@
-import configparser
 import boto3
 import re
 
@@ -12,9 +11,6 @@ class NoOutputFoundError(Exception):
     pass
 
 
-# Parse config to get data to create stack
-cfg = configparser.ConfigParser()
-cfg.read('dwh.cfg')
 STACK_NAME = 'sparkify-stack-name'
 
 

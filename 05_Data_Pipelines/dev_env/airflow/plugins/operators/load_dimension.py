@@ -12,6 +12,7 @@ class LoadDimensionOperator(BaseOperator):
                  redshift_conn_id=None,
                  table=None,
                  truncate=True,
+                 sql=None,
                  pk=None,
                  *args, **kwargs):
 
@@ -19,43 +20,21 @@ class LoadDimensionOperator(BaseOperator):
         self.redshift_conn_id = redshift_conn_id
         self.table = table
         self.truncate = truncate
+        self.sql = sql
         self.pk = pk
 
     def execute(self, context):
         
-        query_name = '{}_table_insert'.format(self.dim)
-        select_query = eval('SqlQueries.{}'.format(query_name)) if query_name in dir(SqlQueries()) else None
-        
+        redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
         if self.truncate:
-            query = """
-                TRUNCATE TABLE {}
-                INSERT INTO {} ({})
-            """.format(
+            redshift.run('TRUNCATE TABLE {}'.format(self.table))
+
+        query = """
+                INSERT INTO {} {}
+                """.format(
                 self.table,
-                self.table,
-                select_query
+                self.sql
             )
-        elif self.table == 'users':               
-             query = """
-                 INSERT INTO {} ({})
-                 ON CONFLICT ({})
-                 DO UPDATE
-                 SET level = EXCLUDED.level;
-                 """.format(
-                 self.table,
-                 query_select,
-                 self.pk
-                )
-        else:
-            query = """
-                 INSERT INTO {} {}
-                 ON CONFLICT ({})
-                 DO NOTHING;
-                 """.format(
-                 self.table,
-                 query_select,
-                 self.pk
-                )
         
-        PostgresHook(postgres_conn_id=self.redshift_conn_id).run(query)
+        redshift.run(query)
 
