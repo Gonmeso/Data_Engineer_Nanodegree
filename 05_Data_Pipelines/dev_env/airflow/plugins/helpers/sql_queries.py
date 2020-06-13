@@ -43,7 +43,7 @@ class SqlQueries:
     
     # From project 3
     staging_table_copy = """
-        COPY '{}'
+        COPY {}
         FROM '{}'
         CREDENTIALS 'aws_iam_role={}'
         TIMEFORMAT AS 'epochmillisecs'
