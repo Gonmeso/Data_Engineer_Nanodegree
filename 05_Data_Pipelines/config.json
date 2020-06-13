@@ -1,0 +1,17 @@
+{
+    "iam_role": "arn:aws:iam::591628149559:role/myRedshiftRole",
+    "s3": {
+        "log_data": "s3://udacity-dend/log_data",
+        "events_data": "s3://udacity-dend/song_data",
+        "log_data_jsonpath": "s3://udacity-dend/log_json_path.json"
+    },
+    "redshift": {
+        "table_staging_events": "staging_events",
+        "table_staging_songs": "staging_songs",
+        "table_songs": "songs",
+        "table_artists": "artists",
+        "table_songplays": "songplays",
+        "table_users": "users",
+        "table_time": "time"
+    }
+}
