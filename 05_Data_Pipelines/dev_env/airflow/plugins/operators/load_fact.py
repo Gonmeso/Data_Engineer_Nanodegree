@@ -24,5 +24,8 @@ class LoadFactOperator(BaseOperator):
             SqlQueries.songplay_table_insert
         )
         
-        PostgresHook(postgres_conn_id=self.redshift_conn_id).run(query)
+        redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
+        self.log.info('Loading factable --> {}'.format(self.table))
+        redshift.run(query)
+        self.log.info('Load finished!')
 

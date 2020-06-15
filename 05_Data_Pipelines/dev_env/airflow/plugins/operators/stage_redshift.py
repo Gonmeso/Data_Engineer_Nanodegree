@@ -31,7 +31,10 @@ class StageToRedshiftOperator(BaseOperator):
             self.json_path            
         )
         
-        PostgresHook(postgres_conn_id=self.redshift_conn_id).run(query)
+        redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
+        self.log.info('Staging Redshift!')
+        redshift.run(query)
+        self.log.info('Staging finished!')
 
 
 

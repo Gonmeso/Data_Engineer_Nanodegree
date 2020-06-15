@@ -35,12 +35,12 @@ class DataQualityOperator(BaseOperator):
         if self.table is None:
             for t in self.tables:
                 self.log.info('Data Quality @  {}'.format(t))
-                records = redshift.run(self.sql_test.format(t))
+                records = redshift.get_records(self.sql_test.format(t))
                 if len(records) < 1 or len(records[0]) < 1 or records[0][0] < 1:
                     self.log.info('Data Quality not passed raising error')
                     raise ValueError('Data Quality not passed for table: {}'.format(t))
         else:
-            records = redshift.run(self.sql_test.format(self.table))
+            records = redshift.get_records(self.sql_test.format(self.table))
             if len(records) < 1 or len(records[0]) < 1 or records[0][0] < 1:
                     self.log.info('Data Quality not passed raising error')
                     raise ValueError('Data Quality not passed for table: {}'.format(t))

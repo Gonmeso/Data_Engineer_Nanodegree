@@ -13,7 +13,6 @@ class LoadDimensionOperator(BaseOperator):
                  table=None,
                  truncate=True,
                  sql=None,
-                 pk=None,
                  *args, **kwargs):
 
         super(LoadDimensionOperator, self).__init__(*args, **kwargs)
@@ -21,12 +20,12 @@ class LoadDimensionOperator(BaseOperator):
         self.table = table
         self.truncate = truncate
         self.sql = sql
-        self.pk = pk
 
     def execute(self, context):
         
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
         if self.truncate:
+            self.log.info('Truncationg table --> {}'.format(self.table))
             redshift.run('TRUNCATE TABLE {}'.format(self.table))
 
         query = """
@@ -35,6 +34,7 @@ class LoadDimensionOperator(BaseOperator):
                 self.table,
                 self.sql
             )
-        
+        self.log.info('Loading dimtable --> {}'.format(self.table))
         redshift.run(query)
+        self.log.info('Load finished!')
 

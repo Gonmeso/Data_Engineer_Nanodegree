@@ -16,7 +16,7 @@ default_args = {
         'owner': 'udacity',
         'start_date': datetime(2020, 6, 12),
         'depends_on_past': False,
-#        'retries': 3,
+        'retries': 3,
         'retry_delay': timedelta(minutes=5),
         'email_on_retry': False
 }
@@ -24,7 +24,7 @@ default_args = {
 dag = DAG('Project_4_Dag',
           default_args=default_args,
           description='Load and transform data in Redshift with Airflow',
-          #schedule_interval='@hourly',
+          schedule_interval='@hourly',
         )
 
 start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
@@ -95,7 +95,9 @@ load_time_dimension_table = LoadDimensionOperator(
 
 run_quality_checks = DataQualityOperator(
     task_id='Run_data_quality_checks',
-    dag=dag
+    dag=dag,
+    redshift_conn_id='redshift',
+    table=None, # If table is none, means that quality checks are done to all tables
 )
 
 end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)
