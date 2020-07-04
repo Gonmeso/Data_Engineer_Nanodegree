@@ -1,5 +1,31 @@
-# Capstone Prject
+# Capstone Project
 
+This is the Capstone project regarding Udacity's Data Engineer Nanodegree. For this project we will focus in creating an analytical database of the world weather and air quality.
+
+## Scope the Project and Gather Data
+
+The data that will be used for this capstone project is the following:
+
+* [Weather data from OpenWeather](https://openweathermap.org/): weather data as hourly temperature, humidity from any location.
+
+* [Air Quality data from Open AQ](https://openaq.org/#/?_k=88s9eb): air quality data measurments for different parametes as NO2 or CO.
+
+
+## Explore and Assess the Data
+Explore the data to identify data quality issues, like missing values, duplicate data, etc.
+Document steps necessary to clean the data
+
+## Define the Data Model
+Map out the conceptual data model and explain why you chose that model
+List the steps necessary to pipeline the data into the chosen data model
+
+## Run ETL to Model the Data
+Create the data pipelines and the data model
+Include a data dictionary
+Run data quality checks to ensure the pipeline ran as expected
+Integrity constraints on the relational database (e.g., unique key, data type, etc.)
+Unit tests for the scripts to ensure they are doing the right thing
+Source/count checks to ensure completeness
 
 ## Getting Started
 
