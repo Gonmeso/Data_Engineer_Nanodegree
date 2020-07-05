@@ -6,6 +6,10 @@ from helpers.sql_queries import SqlQueries
 
 class LoadLocationOperator(BaseOperator):
 
+    """
+    Handles the step of loading locations to the database
+    """
+
     ui_color = '#80BD9E'
 
     @apply_defaults

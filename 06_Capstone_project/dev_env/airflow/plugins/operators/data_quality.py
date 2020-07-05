@@ -4,6 +4,9 @@ from airflow.utils.decorators import apply_defaults
 
 class DataQualityOperator(BaseOperator):
 
+    """
+    Operator to check the data quality of each table
+    """
     ui_color = '#89DA59'
 
     tables = [
@@ -25,6 +28,9 @@ class DataQualityOperator(BaseOperator):
         self.table = table
 
     def execute(self, context):
+        """
+        Execute the data quality check regarding the specified tables
+        """
 
         db = PostgresHook(postgres_conn_id=self.conn_id)
 

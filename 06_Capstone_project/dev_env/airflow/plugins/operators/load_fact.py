@@ -5,6 +5,10 @@ from helpers.sql_queries import SqlQueries
 
 class LoadFactOperator(BaseOperator):
 
+    """
+    Operator regarding the load of fact tables to the postgres database
+    """
+
     ui_color = '#F98866'
 
     @apply_defaults
@@ -20,7 +24,10 @@ class LoadFactOperator(BaseOperator):
         self.values = values
 
     def execute(self, context):
-        
+        """
+        Execute the insert in the postgres DB
+        """
+
         if self.values and isinstance(self.values, list):
             self.values = f"({', '.join(self.values)}) "
         else:

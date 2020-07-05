@@ -30,12 +30,20 @@ class LoadDataOperator(BaseOperator):
 
 
     def _weather_date_to_datetime(self, weather_data):
+        """
+        Change weather data timestamp to datetime for common ground with AQ data
+        """
+
         for idx, hour in enumerate(weather_data):
             hour["dt"] = datetime.utcfromtimestamp(hour["dt"])
             weather_data[idx] = hour
         return weather_data
 
     def _air_date_to_datetime(self, air_data):
+        """
+        Change air data string date to datetime for common ground with weather data
+        """
+
         for idx, measure in enumerate(air_data):
             date = measure["date"]["utc"]
             measure["date"]["utc"] = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ")
@@ -43,6 +51,11 @@ class LoadDataOperator(BaseOperator):
         return air_data
 
     def _get_measures_parameters(self, measures):
+        """
+        Create a dictionary to be filled with existing measures, if no measures
+        are found, the insert will contain nulls
+        """
+
         measures_dict = {
             "no2": "NULL",
             "pm25": "NULL",
@@ -61,7 +74,10 @@ class LoadDataOperator(BaseOperator):
 
 
     def _join_air_and_weather_data(self, air_data, weather_data):
-        
+        """
+        Join Air Quality data and weather data based on the timestamp
+        """
+
         row_list = []
         for hour in weather_data:
             common_data = [m for m in air_data if m["date"]["utc"] == hour["dt"]]
