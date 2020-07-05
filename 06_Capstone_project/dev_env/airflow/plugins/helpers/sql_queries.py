@@ -20,7 +20,7 @@ class SqlQueries:
 
     create_location_table = """
     CREATE TABLE IF NOT EXISTS location_dim_table (
-        location varchar(256),
+        location_id varchar(256),
         country varchar(256),
         city varchar(256),
         lat numeric,
@@ -33,7 +33,7 @@ class SqlQueries:
     CREATE TABLE IF NOT EXISTS measures_fact_table (
         measure_id SERIAL,
         measure_date timestamp,
-        location_id int,
+        location_id varchar(256),
         weather_id int,
         no2 numeric,
         pm25 numeric,
@@ -56,7 +56,7 @@ class SqlQueries:
 
     create_staging_table = """
     CREATE TABLE IF NOT EXISTS staging_table (
-        location_id int,
+        location_id varchar(256),
         main varchar(256),
         description varchar(256),
         measure_date timestamp,
@@ -100,12 +100,34 @@ class SqlQueries:
             LEFT JOIN weather_dim_table weather
             ON staging.description = weather.description
             )
-
-
     """
+
+    insert_staging = """
+    INSERT INTO staging_table (
+        measure_date,
+        location_id,
+        temperature,
+        presure,
+        humidity,
+        clouds,
+        wind_speed,
+        wind_deg,
+        main,
+        description,
+        no2,
+        pm25,
+        pm10,
+        s02,
+        o3,
+        co,
+        bc
+    ) VALUES ('{}', '{}', {}, {}, {}, {}, {}, {}, '{}', '{}', {}, {}, {}, {}, {}, {}, {})
+    """
+
     insert_location = """
-    INSERT INTO location_dim_table (location, country, city, lat, lon)
-    VALUES ('{}', '{}' , '{}', {}, {});
+    INSERT INTO location_dim_table (location_id, country, city, lat, lon)
+    VALUES ('{}', '{}' ,'{}' , {}, {})
+    ON CONFLICT (location_id) DO NOTHING;
     """
 
     insert_weather = """
@@ -120,5 +142,5 @@ class SqlQueries:
     """
 
     get_locations = """
-    SELECT location_id, lat, lon from location_dim_table
+    SELECT location_id, lat, lon FROM location_dim_table
     """

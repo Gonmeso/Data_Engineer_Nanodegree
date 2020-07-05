@@ -1,6 +1,7 @@
 import calendar
 from datetime import datetime, timedelta
 from airflow.hooks.postgres_hook import PostgresHook
+from airflow.hooks.http_hook import HttpHook
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from helpers.sql_queries import SqlQueries
@@ -13,7 +14,8 @@ class LoadDataOperator(BaseOperator):
     def __init__(self,
                  postgres_conn_id=None,
                  open_aq_conn=None,
-                 open_weather_con=None,
+                 open_weather_conn=None,
+                 app_id=None,
                  date=None,
                  limit=60,
                  *args, **kwargs):
@@ -21,7 +23,8 @@ class LoadDataOperator(BaseOperator):
         super(LoadDataOperator, self).__init__(*args, **kwargs)
         self.postgres_conn_id = postgres_conn_id
         self.open_aq_conn = open_aq_conn
-        self.open_weather_con = open_weather_con
+        self.open_weather_conn = open_weather_conn
+        self.app_id = app_id
         self.date = date
         self.limit = limit
 
@@ -40,29 +43,42 @@ class LoadDataOperator(BaseOperator):
         return air_data
 
     def _get_measures_parameters(self, measures):
-        measures_dict = {}
+        measures_dict = {
+            "no2": "NULL",
+            "pm25": "NULL",
+            "pm10": "NULL",
+            "so2": "NULL",
+            "o3": "NULL",
+            "co": "NULL",
+            "bc": "NULL",
+        }
         for measure in measures:
             measures_dict[measure['parameter']] = measure['value']
+        
+
+        self.log.info(f"Current measures: {measures_dict}")
         return measures_dict
 
 
     def _join_air_and_weather_data(self, air_data, weather_data):
         
-        joined_data = {}
+        row_list = []
         for hour in weather_data:
             common_data = [m for m in air_data if m["date"]["utc"] == hour["dt"]]
+            if len(common_data) == 0:
+                continue
             param_dict = self._get_measures_parameters(common_data)
             values = (
+                hour["dt"],
+                self.current_location,
                 hour["temp"],
                 hour["pressure"],
                 hour["humidity"],
                 hour["clouds"],
                 hour["wind_speed"],
                 hour["wind_deg"],
-                hour["temp"],
-                hour["temp"],
-                hour["temp"],
-                hour["temp"],
+                hour["weather"][0]["main"],
+                hour["weather"][0]["description"],
                 param_dict["no2"],
                 param_dict["pm25"],
                 param_dict["pm10"],
@@ -71,6 +87,9 @@ class LoadDataOperator(BaseOperator):
                 param_dict["co"],
                 param_dict["bc"],
             )
+            row_list.append(values)
+        
+        return row_list
 
 
 
@@ -80,6 +99,8 @@ class LoadDataOperator(BaseOperator):
         Gets the air quality data from the API
         """
 
+        self.current_location = location
+        self.log.info(f"########## Current Location: {location} ########## ")
         open_aq = HttpHook(method='GET', http_conn_id=self.open_aq_conn)
         data = {
             'location': location,
@@ -89,7 +110,8 @@ class LoadDataOperator(BaseOperator):
         response = open_aq.run('/v1/measurements', data=data)
 
         if response.status_code == 200:
-            return response.json()['results']
+            self.log.info("Air data successfully retrived from location")
+            return self._air_date_to_datetime(response.json()['results'])
         else:
             raise ValueError
 
@@ -99,19 +121,20 @@ class LoadDataOperator(BaseOperator):
         Gets the weather data from the specified coordinates and time
         """
 
-        open_weather = HttpHook(method='GET', http_conn_id=self.open_weather_con)
+        open_weather = HttpHook(method='GET', http_conn_id=self.open_weather_conn)
         data = {
             'lat': lat,
             'lon': lon,
             'dt': calendar.timegm(self.date.timetuple()),
-            'appid':,
+            'appid': self.app_id,
             'units': 'metric'
         }
 
         response = open_weather.run('/data/2.5/onecall/timemachine', data=data)
 
         if response.status_code == 200:
-            return response.json()['hourly']
+            self.log.info("Weather data successfully retrived from location")
+            return self._weather_date_to_datetime(response.json()['hourly'])
         else:
             raise ValueError
 
@@ -122,15 +145,15 @@ class LoadDataOperator(BaseOperator):
         get_query = "{}  LIMIT {}".format(SqlQueries.get_locations, self.limit) if self.limit is not None else SqlQueries.get_locations
         locations = postgres.get_records(get_query)
 
+        for loc_id, lat, lon in locations:
+            air = self._get_air_data(loc_id)
+            weather = self._get_weather_data(lat, lon)
 
-        # Get queries form SqlQueries
-        query = 'INSERT INTO {} {}'.format(
-            self.table,
-            SqlQueries.songplay_table_insert
-        )
-        
-        
-        self.log.info('Loading factable --> {}'.format(self.table))
-        postgres.run(query)
+            rows = self._join_air_and_weather_data(air, weather)
+
+            for row in rows:
+                self.log.info(row)
+                query = SqlQueries.insert_staging.format(*row)
+                postgres.run(query)
         self.log.info('Load finished!')
 
