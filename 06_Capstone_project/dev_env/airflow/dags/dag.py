@@ -3,7 +3,7 @@ import os
 from airflow import DAG
 from airflow.models import Variable
 from airflow.operators.dummy_operator import DummyOperator
-from operators import LoadLocationOperator, LoadDataOperator, CreateTableOperator, DataQualityOperator, LoadDimensionOperator
+from operators import LoadLocationOperator, LoadDataOperator, CreateTableOperator, DataQualityOperator, LoadDimensionOperator, LoadFactOperator
 from helpers import SqlQueries
 
 api_key = Variable.get('open_weather_app_id')
@@ -12,8 +12,6 @@ default_args = {
         'owner': 'gonmeso',
         'start_date': datetime(2020, 7, 4),
         'depends_on_past': False,
-        # 'retries': 3,
-        'retry_delay': timedelta(minutes=5),
         'email_on_retry': False
 }
 
@@ -75,7 +73,7 @@ load_weather_and_air_quality_data = LoadDataOperator(
     open_aq_conn='open_aq',
     open_weather_conn='open_weather',
     app_id=api_key,
-    limit=1,
+    limit=60,
     date=datetime(2020, 7, 4, 0, 0),
 )
 
@@ -94,6 +92,18 @@ load_weather_dimension_table = LoadDimensionOperator(
     table='weather_dim_table',
     sql=SqlQueries.insert_weather,
     values=['main', 'description']
+)
+
+load_measures_fact_table = LoadFactOperator(
+    task_id='Load_measures_fact_table',
+    dag=dag,
+    postgres_conn_id='postgres',
+    table='measures_fact_table',
+    values=[
+        "location_id", "no2", "pm25", "pm10", "s02", "o3", "co", "bc",
+        "temperature", "presure", "humidity", "clouds", "wind_speed",
+        "wind_deg", "measure_date", "weather_id"
+    ]
 )
 
 run_quality_checks = DataQualityOperator(
@@ -128,8 +138,11 @@ load_weather_and_air_quality_data >> load_time_dimension_table
 load_weather_and_air_quality_data >> load_weather_dimension_table
 
 # Level 5
-load_time_dimension_table >> run_quality_checks
-load_weather_dimension_table >> run_quality_checks
+load_time_dimension_table >> load_measures_fact_table
+load_weather_dimension_table >> load_measures_fact_table
 
 # Level 6
+load_measures_fact_table >> run_quality_checks
+
+# Level 7
 run_quality_checks >> end_operator

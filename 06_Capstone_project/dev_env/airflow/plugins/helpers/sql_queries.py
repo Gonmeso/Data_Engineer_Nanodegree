@@ -94,12 +94,9 @@ class SqlQueries:
         staging.wind_deg,
         staging.measure_date,
         weather.weather_id
-        FROM (
-            SELECT * 
-            FROM staging_table staging
-            LEFT JOIN weather_dim_table weather
-            ON staging.description = weather.description
-            )
+        FROM staging_table staging
+        LEFT JOIN weather_dim_table weather
+        ON staging.description = weather.description
     """
 
     insert_staging = """
@@ -133,6 +130,7 @@ class SqlQueries:
     insert_weather = """
         SELECT DISTINCT main, description
         FROM staging_table
+        ON CONFLICT (description) DO NOTHING
     """
 
     insert_time = """
