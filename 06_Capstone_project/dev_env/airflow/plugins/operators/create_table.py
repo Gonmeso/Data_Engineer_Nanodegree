@@ -15,7 +15,8 @@ class CreateTableOperator(BaseOperator):
         'time_dim_table',
         'weather_dim_table',
         'location_dim_table',
-        'measures_fact_table'
+        'measures_fact_table',
+        'staging_table'
     ]
 
     queries = {
@@ -23,6 +24,7 @@ class CreateTableOperator(BaseOperator):
         'weather_dim_table': SqlQueries.create_weather_table,
         'location_dim_table': SqlQueries.create_location_table,
         'measures_fact_table': SqlQueries.create_measures_table,
+        'staging_table': SqlQueries.create_staging_table,
     }
 
     @apply_defaults

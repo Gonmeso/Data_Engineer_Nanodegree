@@ -3,7 +3,7 @@ import os
 from airflow import DAG
 from airflow.models import Variable
 from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators import LoadLocationOperator, LoadDataOperator, CreateTableOperator, DataQualityOperator
+from operators import LoadLocationOperator, LoadDataOperator, CreateTableOperator, DataQualityOperator
 from helpers import SqlQueries
 
 
@@ -11,7 +11,7 @@ default_args = {
         'owner': 'gonmeso',
         'start_date': datetime(2020, 7, 4),
         'depends_on_past': False,
-        'retries': 3,
+        # 'retries': 3,
         'retry_delay': timedelta(minutes=5),
         'email_on_retry': False
 }
@@ -45,6 +45,13 @@ create_location_table = CreateTableOperator(
     table_name='location_dim_table',
 )
 
+create_staging_table = CreateTableOperator(
+    task_id='Create_staging_table',
+    dag=dag,
+    conn_id='postgres',
+    table_name='staging_table',
+)
+
 create_measures_table = CreateTableOperator(
     task_id='Create_measures_table',
     dag=dag,
@@ -57,7 +64,7 @@ populate_location_table = LoadLocationOperator(
     dag=dag,
     open_aq_conn='open_aq',
     postgres_conn_id='postgres',
-    country='Spain'
+    country='ES'
 )
 
 load_weather_and_air_quality_data = LoadDataOperator(
@@ -82,12 +89,14 @@ end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)
 start_operator >> create_location_table
 start_operator >> create_time_table
 start_operator >> create_weather_table
+start_operator >> create_staging_table
 
 #Level 2
 create_location_table >> create_measures_table
 create_location_table >> populate_location_table
 create_time_table >> create_measures_table
 create_weather_table >> create_measures_table
+create_staging_table >> create_measures_table
 
 #Level 3
 create_measures_table >> load_weather_and_air_quality_data
