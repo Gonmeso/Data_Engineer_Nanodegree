@@ -49,7 +49,7 @@ class LoadDimensionOperator(BaseOperator):
                 """.format(
                 self.table,
                 self.values,
-                self.sql,
+                self.sql)
 
         self.log.info('Loading dimtable --> {}'.format(self.table))
         postgres.run(query)
