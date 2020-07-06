@@ -10,7 +10,6 @@ The data that will be used for this capstone project is the following:
 
 * [Air Quality data from Open AQ](https://openaq.org/#/?_k=88s9eb): air quality data measurments for different parametes as NO2 or CO.
 
-
 ## Explore and Assess the Data
 
 As each data source comes from an API, the data will be formated as a JSON. So lets check our main data sources for this project:
@@ -165,6 +164,96 @@ As stated above, the data model will be as follows:
 
 How this data model is done regarding the data is shown in the next step.
 
+## Data Dictionary
+
+### location_dim_table
+
+* *location_id*: string serving as a location single identifier
+
+* *country*: string with the locations country
+
+* *city*: string with the locations city
+
+* *lat*: float with latitude coordinates
+
+* *lon*: float with longitude coordinates
+
+### weather_dim_table
+
+* *weather_id*: integer serving as a single identifier of the weather
+
+* *main*: string describing the main weather (Rain, Sunny, ...)
+
+* *description*: string further description of weather (Light Rain)
+
+### time_dim_table
+
+* *measure_date*: timestamp regarding the time when the measures have been taken
+
+* *hour*: integer with the extracted hour of the timestamp
+
+* *day*: integer with the extracted day of the timestamp
+
+* *week*: integer with the extracted week of the timestamp
+
+* *month*: integer with the extracted month of the timestamp
+
+* *year*: integer with the extracted year of the timestamp
+
+### measures_fact_table
+
+* *measure_id*: integer identifier for a single measure
+
+* *measure_date*: timestamp regarding the time when the measures have been taken, related to `time_dim_table`
+
+* *location_id*: string serving as a location single identifier, related to `location_dim_table`
+
+* *no2*: float regarding the amount of nitrogen dioxide in the air measured in ppm (particles per million)
+
+* *pm25*: float regarding the amount of particulate matter less than 2.5 micrometers in diameter in the air measured in µg/m³
+
+* *pm10*: float regarding the amount of particulate matter less than 10 micrometers in diameter in the air measured in µg/m³
+
+* *so2*: float regarding the amount of sulfur dioxide in the air measured in ppm (particles per million)
+
+* *o3*: float regarding the amount of ozone in the air measured in ppm (particles per million)
+
+* *co*: float regarding the amount of carbon monoxide in the air measured in ppm (particles per million)
+
+* *bc*: float regarding the amount of black carbon in the air measured in µg/m³
+
+* *temperature*: float of the measure in temperature, measured in celsius
+
+* *pressure*: float of the atmospheric pressure on the sea level, measured in hPa
+
+* *humidity*: percentage of humidity
+
+* *clouds*: percentage of cloudiness
+
+* *wind_speed*: speed of the wind as a float, measured in m/s
+
+* *wind_deg*: wind direction as a float in degrees
+
+* *weather_id*: integer serving as a single identifier of the weather, related to `weather_dim_table`
+
+## Purpuose of the data model
+
+This data models is focused on providing enough information to perform analysis on air quality and weather data regarding a set of aspects:
+
+* Does time affects the air quality?
+
+* Is it related to weather?
+
+* Does seasons have a great impact?
+
+* Is it time related?
+
+* Does the latitud and longitude have a great impact? What about the city?
+
+* ...
+
+As stated before is focused on providing the data source to perform data analysis and provided enough data to anser the questions. As its purpuose its merely analytical it's design for *Data Analysts* or *Data Scientist* that can perform data exploration and gain insights, create a dashboard, forecast air quality, ...
+
 ## Run ETL to Model the Data
 
 In orther to create the data model the following steps have been followed:
@@ -186,19 +275,21 @@ This flow has been done using Airflows Data Pipelines and the result (including 
 
 As the measures table has dependencies with the previous ones is created later.
 
+## Technologies used and justification
+
+For this project the main tool used is **Apache Airflow**. This is due to the easy implementation of the data pipeline and the necessity of running the pipeline daily due to the nature of the data (daily measures). Also a PostgreSQL database is used to organize data in a star schema, focused on data analysis. A couple of queries to gather data on which to perform analysis are shown later.
+
 ## Extra questions
 
-*If the data was increased by 100x*
+### *If the data was increased by 100x*
 
 Due to the APIs nature of the data the data is managed one location at a time for the staging table and will not be affected much. The following steps are performed using postgres basically so it could be one of the pain points. As of now its running locally on a single node, but for much larger data we could think about using a bigger machine (vertical scalling) regarding cpu and ram or we could switch into a more scalable aproach using a data warehouse as redshitf that can be multinode. Also if an horizontal scaling is preferred a NoSQL database could be of use but it will change the model completly.
 
-
-*If the pipelines were run on a daily basis by 7am*
+### *If the pipelines were run on a daily basis by 7am*
 
 The pipeline is focused on running daily so it will be no problem running at 7am, indeed, as it gets daily data of the previous day for a series of locations it will be a great time to execute the process.
 
-
-*If the database needed to be accessed by 100+ people*
+### *If the database needed to be accessed by 100+ people*
 
 If the database is heavely accessed we must first find what is being accessed and how. For example this is focused on data analysis so knowing the most common analytical needs could serve as base to precompute the queries. For example the average value by time or by place could be easily added as an extra step of the pipeline.
 
@@ -208,14 +299,13 @@ If the database is heavely accessed we must first find what is being accessed an
 
 ![query2](./img/query2.png)
 
-# Getting Started
-
+## Getting Started
 
 ### Folder structure
 
 The project is structured as follows:
 
-```
+```bash
 .
 ├── README.md
 ├── dev_env
@@ -248,7 +338,6 @@ To make this project work you will need the following dependencies:
 **Python**: as our main programming language
 **Docker**: for running Airflow locally using the `docker-compose.yml` file
 
-
 #### Starting Airflow
 
 In order to start Airflow the only thing we need is to get into the projects root dir `06Capstone_Project` and run `docker-compose up`. At the begining Airflow will find a couple of errors of non-defined variable, so we must add it. This variable `open_weather_app_id` is the `API_KEY` used by Open weather, so lets add it:
@@ -278,4 +367,3 @@ Once everything is set you con trigger the dash to start the process!
 ## Acknowledgments
 
 * Thanks to Udacity for the project!
-
