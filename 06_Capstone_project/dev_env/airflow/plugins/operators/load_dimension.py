@@ -3,22 +3,26 @@ from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from helpers.sql_queries import SqlQueries
 
+
 class LoadDimensionOperator(BaseOperator):
 
     """
     Operator regarding the load of dimension tables to the postgres database
     """
 
-    ui_color = '#80BD9E'
+    ui_color = "#80BD9E"
 
     @apply_defaults
-    def __init__(self,
-                 postgres_conn_id=None,
-                 table=None,
-                 truncate=False,
-                 sql=None,
-                 values=None,
-                 *args, **kwargs):
+    def __init__(
+        self,
+        postgres_conn_id=None,
+        table=None,
+        truncate=False,
+        sql=None,
+        values=None,
+        *args,
+        **kwargs,
+    ):
 
         super(LoadDimensionOperator, self).__init__(*args, **kwargs)
         self.postgres_conn_id = postgres_conn_id
@@ -31,12 +35,14 @@ class LoadDimensionOperator(BaseOperator):
 
         """
         Execute the insert in the postgres DB
+
+        :param context: Airflow's context.
         """
 
         postgres = PostgresHook(postgres_conn_id=self.postgres_conn_id)
         if self.truncate:
-            self.log.info('Truncationg table --> {}'.format(self.table))
-            postgres.run('TRUNCATE TABLE {}'.format(self.table))
+            self.log.info("Truncationg table --> {}".format(self.table))
+            postgres.run("TRUNCATE TABLE {}".format(self.table))
 
         # Let Postgres handle de PK (SERIAL field)
         if self.values and isinstance(self.values, list):
@@ -47,10 +53,9 @@ class LoadDimensionOperator(BaseOperator):
         query = """
                 INSERT INTO {} {} {}
                 """.format(
-                self.table,
-                self.values,
-                self.sql)
+            self.table, self.values, self.sql
+        )
 
-        self.log.info('Loading dimtable --> {}'.format(self.table))
+        self.log.info("Loading dimtable --> {}".format(self.table))
         postgres.run(query)
-        self.log.info('Load finished!')
+        self.log.info("Load finished!")

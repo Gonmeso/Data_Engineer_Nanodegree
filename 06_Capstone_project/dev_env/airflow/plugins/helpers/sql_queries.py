@@ -1,4 +1,10 @@
 class SqlQueries:
+
+    """
+    Helper class with the SQL queries regarding the project. To be used along
+    the Postgres hook.
+    """
+
     create_time_table = """
     CREATE TABLE IF NOT EXISTS time_dim_table
         (measure_date timestamp,

@@ -3,20 +3,17 @@ from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from helpers.sql_queries import SqlQueries
 
+
 class LoadFactOperator(BaseOperator):
 
     """
     Operator regarding the load of fact tables to the postgres database
     """
 
-    ui_color = '#F98866'
+    ui_color = "#F98866"
 
     @apply_defaults
-    def __init__(self,
-                 postgres_conn_id=None,
-                 table=None,
-                 values=None,
-                 *args, **kwargs):
+    def __init__(self, postgres_conn_id=None, table=None, values=None, *args, **kwargs):
 
         super(LoadFactOperator, self).__init__(*args, **kwargs)
         self.postgres_conn_id = postgres_conn_id
@@ -26,20 +23,23 @@ class LoadFactOperator(BaseOperator):
     def execute(self, context):
         """
         Execute the insert in the postgres DB
+
+        :param context: Airflow's context.
         """
 
+        # Format a set of values if provided
         if self.values and isinstance(self.values, list):
             self.values = f"({', '.join(self.values)}) "
         else:
             self.values = ""
 
-        query = 'INSERT INTO {} {} {}'.format(
-            self.table,
-            self.values,
-            SqlQueries.insert_measures
+        # Create Query
+        query = "INSERT INTO {} {} {}".format(
+            self.table, self.values, SqlQueries.insert_measures
         )
-        
+
+        # Load fact table
         postgres = PostgresHook(postgres_conn_id=self.postgres_conn_id)
-        self.log.info('Loading factable --> {}'.format(self.table))
+        self.log.info("Loading factable --> {}".format(self.table))
         postgres.run(query)
-        self.log.info('Load finished!')
+        self.log.info("Load finished!")

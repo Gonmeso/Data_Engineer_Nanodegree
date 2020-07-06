@@ -4,21 +4,25 @@ from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from helpers.sql_queries import SqlQueries
 
+
 class LoadLocationOperator(BaseOperator):
 
     """
     Handles the step of loading locations to the database
     """
 
-    ui_color = '#80BD9E'
+    ui_color = "#80BD9E"
 
     @apply_defaults
-    def __init__(self,
-                 postgres_conn_id=None,
-                 open_aq_conn=None,
-                 endpoint='/v1/locations',
-                 country=None,
-                 *args, **kwargs):
+    def __init__(
+        self,
+        postgres_conn_id=None,
+        open_aq_conn=None,
+        endpoint="/v1/locations",
+        country=None,
+        *args,
+        **kwargs,
+    ):
 
         super(LoadLocationOperator, self).__init__(*args, **kwargs)
         self.postgres_conn_id = postgres_conn_id
@@ -30,7 +34,12 @@ class LoadLocationOperator(BaseOperator):
 
         """
         Helper function to insert each location recieved from the response
+
+        :param postgres_hook: Airflows PostgresHook to perform insertions
+        :param data: location dictionary containing the data
         """
+
+        # Get data for each location
         for location in data:
             loc_id = location.get("location")
             country = location.get("country")
@@ -38,22 +47,26 @@ class LoadLocationOperator(BaseOperator):
             lat = location.get("coordinates").get("latitude")
             lon = location.get("coordinates").get("longitude")
 
+            # Format query
             query = SqlQueries.insert_location.format(loc_id, country, city, lat, lon)
-            self.log.info('Loading the following location: {}-{}-{}-{}-{}'.format(
-                loc_id, country, city, lat, lon
-            ))
+            self.log.info(
+                "Loading the following location: {}-{}-{}-{}-{}".format(
+                    loc_id, country, city, lat, lon
+                )
+            )
+            # Insert row
             postgres_hook.run(query)
-            self.log.info('Location inserted successfully')
-
+            self.log.info("Location inserted successfully")
 
     def execute(self, context):
-        
+
         db = PostgresHook(postgres_conn_id=self.postgres_conn_id)
 
-        open_aq = HttpHook(method='GET', http_conn_id=self.open_aq_conn)
+        # Get location data from API
+        open_aq = HttpHook(method="GET", http_conn_id=self.open_aq_conn)
         data = {
-            'country': self.country,
-            'limit': 1000,
+            "country": self.country,
+            "limit": 1000,
         }
         response = open_aq.run(self.endpoint, data=data)
 
@@ -62,5 +75,5 @@ class LoadLocationOperator(BaseOperator):
         else:
             raise ValueError(f"Status Code is {response.status_code}")
 
-        self.log.info('Load finished!')
+        self.log.info("Load finished!")
 

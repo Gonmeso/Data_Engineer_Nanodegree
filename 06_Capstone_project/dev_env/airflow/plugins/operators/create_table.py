@@ -11,28 +11,26 @@ class CreateTableOperator(BaseOperator):
     the application database.
     """
 
+    # All tables invollved in the project
     tables = [
-        'time_dim_table',
-        'weather_dim_table',
-        'location_dim_table',
-        'measures_fact_table',
-        'staging_table'
+        "time_dim_table",
+        "weather_dim_table",
+        "location_dim_table",
+        "measures_fact_table",
+        "staging_table",
     ]
 
+    # Mapping of tables and queries
     queries = {
-        'time_dim_table': SqlQueries.create_time_table,
-        'weather_dim_table': SqlQueries.create_weather_table,
-        'location_dim_table': SqlQueries.create_location_table,
-        'measures_fact_table': SqlQueries.create_measures_table,
-        'staging_table': SqlQueries.create_staging_table,
+        "time_dim_table": SqlQueries.create_time_table,
+        "weather_dim_table": SqlQueries.create_weather_table,
+        "location_dim_table": SqlQueries.create_location_table,
+        "measures_fact_table": SqlQueries.create_measures_table,
+        "staging_table": SqlQueries.create_staging_table,
     }
 
     @apply_defaults
-    def __init__(self,
-                 conn_id=None,
-                 table_name=None,
-                 *args,
-                 **kwargs):
+    def __init__(self, conn_id=None, table_name=None, *args, **kwargs):
 
         """
         Operator to create tables given a specific table if the table is not within
@@ -46,12 +44,14 @@ class CreateTableOperator(BaseOperator):
     def execute(self, context):
 
         """
-        Logic to create the table
+        Logic to create the table using a PostgresHook
+
+        :param context: Airflow's context.
         """
 
         if self.table_name not in self.tables:
-            table_msg = 'The indicated tables is not within this list:  {}'.format(
-                ' | '.join(self.tables)
+            table_msg = "The indicated tables is not within this list:  {}".format(
+                " | ".join(self.tables)
             )
             raise ValueError(mestable_msgsage)
 
