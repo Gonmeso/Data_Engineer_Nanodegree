@@ -9,7 +9,7 @@ jupyter-client==5.2.4
 jupyter-core==4.4.0
 jupyterlab==1.0.9
 jupyterlab-server==1.0.0
-notebook==5.7.8
+notebook==6.4.12
 pandas
 psycopg2==2.7.4
 tornado==5.1.1
